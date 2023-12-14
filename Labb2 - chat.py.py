@@ -4,18 +4,14 @@ import threading
 import queue
 
 
-CLIENT_ID = f'kyh-mqtt-{random.randint(0, 1000)}'
-USERNAME = ''
-PASSWORD = ''
-BROKER = 'broker.hivemq.com'
+CLIENT_ID = f"kyh-mqtt-{random.randint(0, 1000)}"
+USERNAME = ""
+PASSWORD = ""
+BROKER = "broker.hivemq.com"
 PORT = 1883
 
-"""
-TODO: Skapa en dictionary: namn på chat-rum som mappar till en topic
-Ex: python -> kyhchat/group1/python
-Skapa tre olika chat-rum
-"""
-CHAT_ROOMS = {}
+# TODO_1
+CHAT_ROOMS = {"room1": "chat/group1", "room2": "chat/group2", "room3": "chat/group3"}
 
 
 class Chat:
@@ -35,7 +31,7 @@ class Chat:
         if rc == 0:
             print('Connected to Chat Server. Type "quit" to quit.')
         else:
-            print(f'Error connecting to Chat Server. Error code {rc}')
+            print(f"Error connecting to Chat Server. Error code {rc}")
 
     def connect_mqtt(self):
         # Create a MQTT client object.
@@ -52,14 +48,12 @@ class Chat:
         self.client.connect(BROKER, PORT)
 
     def on_message(self, client, userdata, message):
-        """
-        TODO: Implementera: När vi tar emot ett meddelande.
-
-        Avkoda meddelandet (message) och skriv ut det.
-        Skriv bara ut meddelandet om det börjar med någon annans användarnamn
-        (Dvs. Skriv inte ut meddelanden du själv skickat)
-
-        """
+        # TODO_2
+        msg = message.payload.decode("utf-8")
+        if msg.startswith(f"{self.username}"):
+            return
+        else:
+            print(f"{message.payload.decode('utf-8')}")
 
     def init_client(self):
         # Subscribe to selected topic
@@ -84,10 +78,8 @@ class Chat:
         # Start the paho client loop
         self.client.loop_start()
 
-        """
-        TODO: Implementera: Skicka ett meddelande till chat-rummet att användaren har anslutit!
-        Ex: Andreas has joined the chat
-        """
+        # TODO_3
+        self.client.publish(self.topic, f"{self.username} , has joined the chat.")
 
     def run(self):
         self.init_client()
@@ -101,22 +93,17 @@ class Chat:
 
                 # Check if the user wants to exit the application
                 if msg_to_send.lower() == "quit":
-
-                    """
-                    TODO: Implementera: Om användaren vill avsluta ska vi skicka ett meddelande om det.
-                    Ex: Andreas has left the chat
-                    """
+                    # TODO_4
+                    self.client.publish(
+                        self.topic, f"{self.username} , has left the chatroom."
+                    )
 
                     # Indicate to the input thread that it can exit
                     self.running = False
                     break
 
-                """
-                TODO: Implementera: Skicka meddelande till chatten.
-                Formulera ett meddelande som börjar med användarnamn, följt av meddelandet.
-                Skicka sedan meddelandet.
-                Ex: <Andreas> Hej alla!
-                """
+                # TODO_5
+                self.client.publish(self.topic, f"{self.username} : {msg_to_send}")
 
             except queue.Empty:  # We will end up here if there was no user input
                 pass  # No user input, do nothing
@@ -140,5 +127,5 @@ def main():
     chat.run()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
