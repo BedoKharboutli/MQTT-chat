@@ -13,7 +13,6 @@ PASSWORD = ""
 BROKER = "broker.hivemq.com"
 PORT = 1883
 
-# TODO_1
 CHAT_ROOMS = {"room1": "chat/group1", "room2": "chat/group2", "room3": "chat/group3"}
 
 
@@ -99,7 +98,6 @@ class Chat:
         # Start the paho client loop
         self.client.loop_start()
 
-        # TODO_3
         # self.client.publish(self.topic, f"{self.username} , has joined the chat.")
         encrypted_msg = self.fernet.encrypt(
             f"{self.username} , has joined the chat.".encode()
@@ -118,7 +116,7 @@ class Chat:
 
                 # Check if the user wants to exit the application
                 if msg_to_send.lower() == "quit":
-                    # TODO_4
+
                     """self.client.publish(
                         self.topic, f"{self.username} , has left the chatroom."
                     )"""
@@ -131,7 +129,7 @@ class Chat:
                     self.running = False
                     break
 
-                # TODO_5
+        
                 # self.client.publish(self.topic, f"{self.username} : {msg_to_send}")
                 encrypted_msg = self.fernet.encrypt(
                     f"{self.username} : {msg_to_send}".encode()
